@@ -1,4 +1,4 @@
-<img src="man/Figures/FloridaDolphins_logo.png" align="right" width="120px"/>
+<img src="man/Figures/FloridaDolphinsLogo.png" align="right" width="120px"/>
 
 # Florida Dolphins
 Resilience of dolphin foraging cultures facing climate and habitat changes
