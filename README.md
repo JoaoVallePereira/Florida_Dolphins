@@ -1,7 +1,6 @@
 <img src="man/Figures/FloridaDolphinsLogo.png" align="right" width="200px"/>
 
 # Florida Dolphins
-Resilience of dolphin foraging cultures facing climate and habitat changes
 
 
 # README #
