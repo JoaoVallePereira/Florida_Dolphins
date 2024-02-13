@@ -20,3 +20,5 @@ This repository includes the R script to reproduce the analyses and the suppleme
 Resilience of dolphin foraging cultures facing climate and habitat changes
 
 Valle-Pereira, J.V.S [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](http://orcid.org/0000-0002-1880-9495); Cantor, M. [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](http://orcid.org/0000-0002-0019-5106), Torres, L. *In prep*.
+
+DATA FOLDER IS HIDDEN FOR THE MOMENT!!!!!!!!!!
