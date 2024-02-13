@@ -249,7 +249,7 @@ for(i in 1:length(list_RANDOM_SRI)){
   SDSRI_random[[i]] <- sdtmp
 }
 
-#### Assortativity SRI Random ####
+#### Assortativity SRI Random #### 
 
 listASSORT_FP_SRI_random <- list()
 listASSORT_HR_SRI_random <- list()
