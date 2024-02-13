@@ -49,4 +49,5 @@ po/*~
 rsconnect/
 
 # Data (check with Leigh)
-/data/
+/data/raw
+/data/processed
