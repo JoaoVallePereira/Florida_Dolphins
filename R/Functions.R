@@ -59,3 +59,8 @@ SRI =  function (matr) {
        SRI.numerator = inmat,  # Numerator of the SRI
        SRI.denominator = denmat) # Denominator of the SRI
 }
+
+# Unfold Matrix (by ALexandre Machado) ----
+matrix_unfold <- function(x) {
+  x[lower.tri(x, diag=FALSE)]
+}

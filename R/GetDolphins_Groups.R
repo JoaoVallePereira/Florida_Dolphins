@@ -151,6 +151,35 @@ for(i in 1:length(GBI_by_context)){
 }
 
 
+#### SRI + DENMAT ###
+listALL <- GBI_by_context
+list_SRI_real <- list()
+list_INMAT_real <- list()
+list_DENMAT_real <- list()
+list_SD_SRI_real <- list()
+
+for(i in 1:length(listALL)){
+  
+  list_SRI_real[[i]] <- SRI(listALL[[i]])$SRI %>% 
+    order_matrix() %>% 
+    as.matrix()
+  
+  list_INMAT_real[[i]] <- SRI(listALL[[i]])$SRI.numerator %>% 
+    order_matrix() %>% 
+    as.matrix()
+  
+  list_DENMAT_real[[i]] <- SRI(listALL[[i]])$SRI.denominator %>% 
+    order_matrix() %>% 
+    as.matrix()
+  
+  list_SD_SRI_real[[i]] <-sd(matrix_unfold(list_SRI_real[[i]]))
+  
+}
+
+str(list_SRI_real)
+
+
+
 #### RANDOM SRI + INMAT + DENMAT ####
 list_RANDOM_SRI <- list()
 list_RANDOM_INMAT <- list()
@@ -197,15 +226,15 @@ modularity_memb_SRI_real <- list()
 
 for(i in 1:length(list_SRI_real)){
   
-  tmp1 <- graph.adjacency(list_SRI_real[[i]], 
+  tmp1 <- igraph::graph.adjacency(list_SRI_real[[i]], 
                           mode="undirected",
                           weighted=TRUE,
                           diag=FALSE)
   
-  tmpmod <- cluster_leading_eigen(graph = tmp1,
-                                  weights = E(tmp1)$weight)
+  tmpmod <- igraph::cluster_leading_eigen(graph = tmp1,
+                                  weights = igraph::E(tmp1)$weight)
   
-  modularity_SRI_real[[i]] <- modularity(tmpmod)
+  modularity_SRI_real[[i]] <- igraph::modularity(tmpmod)
   modularity_size_SRI_real[[i]] <- table(tmpmod$membership)
   modularity_memb_SRI_real[[i]] <- data.frame(Id=row.names(list_SRI_real[[i]]), module=tmpmod$membership)
 }
@@ -218,17 +247,17 @@ listMOD_SRI_random <- list()
 for(i in 1:length(list_SRI_real)){
   for(j in 1:Npermute){
     
-    tmp.graph <- graph.adjacency(as.matrix(list_RANDOM_SRI[[i]][[j]]),
+    tmp.graph <- igraph::graph.adjacency(as.matrix(list_RANDOM_SRI[[i]][[j]]),
                                  mode = "undirected",
                                  diag = FALSE,
                                  weighted = TRUE)
     #tmp.graph <- giant.component(tmp.graph)
     
-    tmpmod2 <- cluster_leading_eigen(graph = tmp.graph,
-                                     weights = E(tmp.graph)$weight,
+    tmpmod2 <-  igraph::cluster_leading_eigen(graph = tmp.graph,
+                                     weights =  igraph::E(tmp.graph)$weight,
                                      options=list(maxiter=1000000))
     
-    modularity_SRI_random[j] <- modularity(tmpmod2)
+    modularity_SRI_random[j] <-  igraph::modularity(tmpmod2)
     
   }
   
@@ -261,13 +290,13 @@ for(i in 1:length(list_RANDOM_SRI)){
   
   for(j in 1:Npermute){
     
-    SRI.rand.tmp.fp <- assortment.continuous(list_RANDOM_SRI[[i]][[j]], 
+    SRI.rand.tmp.fp <- assortnet::assortment.continuous(list_RANDOM_SRI[[i]][[j]], 
                                              vertex_values = ord.df$Freq_Int,
                                              weighted = TRUE, 
                                              SE = FALSE)
     SRI_assortFP_random[j] <- SRI.rand.tmp.fp[[1]]
     
-    SRI.rand.tmp.hr <- assortment.continuous(list_RANDOM_SRI[[i]][[j]],
+    SRI.rand.tmp.hr <- assortnet::assortment.continuous(list_RANDOM_SRI[[i]][[j]],
                                              vertex_values = ord.df$HR,
                                              weighted = TRUE, 
                                              SE = FALSE)
@@ -287,12 +316,12 @@ listASSORT_HR_SRI_real <- list()
 
 for(i in 1:length(list_SRI_real)){
   
-  listASSORT_FP_SRI_real[[i]] <- assortment.continuous(list_SRI_real[[i]],
+  listASSORT_FP_SRI_real[[i]] <- assortnet::assortment.continuous(list_SRI_real[[i]],
                                                        vertex_values = ord.df$Freq_Int,
                                                        weighted = TRUE,
                                                        SE = FALSE)  
   
-  listASSORT_HR_SRI_real[[i]] <- assortment.continuous(list_SRI_real[[i]],
+  listASSORT_HR_SRI_real[[i]] <- assortnet::assortment.continuous(list_SRI_real[[i]],
                                                        vertex_values = ord.df$HR,
                                                        weighted = TRUE,
                                                        SE = FALSE) 
