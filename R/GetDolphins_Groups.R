@@ -329,13 +329,105 @@ for(i in 1:length(list_SRI_real)){
 }
 
 
+# Colorblind palette
+color.mod <- c("#E69F00", # orange
+               "#56B4E9", # sky blue
+               "#009E73", # bluish green
+               "#F0E442", # yellow
+               "#D55E00", # vermilion
+               "#CC79A7", # reddish purple
+               "#0072B2", # blue
+               "#999999") # grey
+
+# SRI Networks 
+par(mfrow = c(4,2), mar = c(0,1,0,1))
+
+layout.net <- list()
+
+for(i in 1:length(list_SRI_real)){
+  
+  SRInet <- graph.adjacency(as.matrix(list_SRI_real[[i]]),
+                            mode = "undirected",
+                            weighted = TRUE,
+                            diag = FALSE)
+  
+  mod.SRI <- cluster_leading_eigen(SRInet)
+  
+  layout.net[[i]] <- igraph::layout.fruchterman.reingold(SRInet)
+  
+  if(i == 2){
+    
+    plot.igraph(SRInet,
+                layout = layout.net[[i]],
+                main = namesCONTEXT[i],
+                edge.color = alpha('grey80', 0.9),
+                vertex.label = NA,
+                # vertex.size = rescale(node.size.fp, 
+                                      # r.out = range(5,15)),
+                edge.width = E(SRInet)$weight * 10,
+                vertex.color = "grey50")
+    
+  } else {
+    
+    plot.igraph(SRInet,
+                layout = layout.net[[i]],
+                main = namesCONTEXT[i],
+                edge.color = alpha('grey80', 0.9),
+                vertex.label = NA,
+                # vertex.size = rescale(node.size.fp, 
+                                      # r.out = range(5,15)),
+                edge.width = E(SRInet)$weight * 10,
+                vertex.color = color.mod[mod.SRI$membership]) 
+  }
+}
+
+plot.igraph(SRInet,
+            layout = layout.net[["All_Behavior"]],
+            main = namesCONTEXT["All_Behavior"],
+            edge.color = alpha('grey80', 0.9),
+            vertex.label = NA,
+            # vertex.size = rescale(node.size.fp, 
+            # r.out = range(5,15)),
+            edge.width = E(SRInet)$weight * 10,
+            vertex.color = color.mod[mod.SRI$membership]) 
 
 
+# All Behavior network
 
 
+tmp1 <- igraph::graph.adjacency(list_SRI_real[[i]], 
+                                mode="undirected",
+                                weighted=TRUE,
+                                diag=FALSE)
+
+# Get vertex color
+
+dolphin_per_tactic <- GBI_fullSET %>% 
+  dplyr::select(-date, -foraging, -zone) %>% 
+  reshape2::melt(value.name = "tactic") %>% 
+  dplyr::rename(y = 3, id = variable) %>% 
+  dplyr::group_by(id, tactic) %>% 
+  dplyr::summarise(count_tactic = sum(y))
+
+most_common_tactic_id <- dolphin_per_tactic %>% 
+  dplyr::group_by(id) %>% 
+  dplyr::slice(which.max(count_tactic)) %>% 
+  arrange(desc(count_tactic)) %>% 
+  data.frame()
 
 
-
+rede_full <- igraph::graph.adjacency(list_SRI_real[[1]],
+                                     mode="undirected",
+                                     diag=FALSE,
+                                     weighted=TRUE)
+plot(rede_full,
+     edge.arrow.size=.5,
+     vertex.color="gold",
+     vertex.size=5, 
+     vertex.frame.color="gray",
+     vertex.label.cex=0.6, 
+     vertex.label.dist=2,
+     edge.curved=0.2)
 
 
 

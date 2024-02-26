@@ -64,3 +64,20 @@ SRI =  function (matr) {
 matrix_unfold <- function(x) {
   x[lower.tri(x, diag=FALSE)]
 }
+
+# Rescale (by Alexandre Machado)
+#' @title Rescaling distribution
+#' @description Rescales a distribution to a chosen range
+#' @param x vector to be rescaled
+#' @param r.out vector with limits of the new distribution
+#' @return vector with rescaled distribution
+#' @examples
+#' # generating 10-sample uniform distribution from 1 to 100 and rescaling it to 0 to 1
+#' data <- runif(10, 1, 100)
+#' rescale(data, r.out=c(0,1))
+
+rescale <- function(x, r.out) {
+  p <- (x - min(x)) / (max(x) - min(x))
+  r.out[[1]] + p * (r.out[[2]] - r.out[[1]])
+}
+
