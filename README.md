@@ -1,8 +1,4 @@
 <img src="man/Figures/FloridaDolphinsLogo.png" align="right" width="200px"/>
-
-# Florida Dolphins
-
-
 # README #
 
 ## Author, maintainer and contact
