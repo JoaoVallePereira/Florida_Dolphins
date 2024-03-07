@@ -6,5 +6,6 @@ if(!require(pander)){install.packages('pander'); library(pander)}
 if(!require(vegan)){install.packages('vegan'); library(vegan)}
 if(!require(igraph)){install.packages('igraph'); library(igraph)}
 if(!require(assortnet)){install.packages('assortnet'); library(assortnet)}
-if(!require(bisonR)){install.packages('bisonR'); library(bisonR)}
+# remotes::install_github("JHart96/bisonR")
+library(bisonR)
 if(!require(INLA)){install.packages('INLA'); library(INLA)}
