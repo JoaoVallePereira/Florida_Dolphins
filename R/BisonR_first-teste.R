@@ -1,25 +1,3 @@
-library(bisonR)
-
-sim_data <- simulate_bison_model("binary", aggregated = TRUE)
-df3 <- sim_data$df_sim
-
-priors <- get_default_priors("binary")
-
-fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id), 
-  data=df3, 
-  model_type="binary",
-  priors=priors
-)
-
-summary(fit_edge)
-plot_network(fit_edge)
-
-
-
-sim_data2 <- simulate_bison_model("binary", aggregated = FALSE)
-df2 <- sim_data2$df_sim
-
 # Load raw data ----
 
 data.raw <- read.csv("./data/raw/data_for_SOCPROG.csv") %>% 
@@ -99,6 +77,8 @@ df4 <- dfDyads_full2 %>%
   group_by(node_1, node_2) %>%
   mutate(dyad_id=cur_group_id()) %>%
   mutate(obs_id=as.integer(obs_id))
+# saveRDS(df4, file = "./data/processed/DF_dyads.rds")
+
 
 model_data <- list(
   N=nrow(df4), # Number of observations
@@ -132,8 +112,8 @@ saveRDS(fit_inla, file = "./data/processed/fit_inla.rds")
 
 summary(fit_inla)$fixed
 
-est_inla <- summary(fit_inla)$fixed[1:28, 1]
-est_stan <- summary(fit)$summary[1:28, 1]
+est_inla <- summary(fit_inla)$fixed[1:6636, 1]
+est_stan <- summary(fit)$summary[1:6636, 1]
 
 plot(est_stan, est_inla)
 
@@ -155,16 +135,49 @@ for (i in 1:model_data$M) {
   logit_p_samples[, i] <- rnorm(num_samples, mu, sigma)
 }
 logit_p_samples
+# saveRDS(logit_p_samples, file = "./data/processed/logit_p_samples.rds")
+
+
+
+p_samples <- plogis(logit_p_samples)
+adj_tensor <- array(0, c(427, 427, num_samples))
+for (dyad_id in 1:model_data$M) {
+  dyad_row <- df4[df4$dyad_id == dyad_id, ]
+  adj_tensor[dyad_row$node_1, dyad_row$node_2, ] <- p_samples[, dyad_id]
+}
+adj_tensor[, , 1] # Print the first sample of the posterior distribution over adjacency matrices
+
+
+
+# Calculate lower, median, and upper quantiles of edge weights. Lower and upper give credible intervals.
+adj_quantiles <- apply(adj_tensor, c(1, 2), function(x) quantile(x, probs=c(0.025, 0.5, 0.975)))
+adj_lower <- adj_quantiles[1, , ]
+adj_mid <- adj_quantiles[2, , ]
+adj_upper <- adj_quantiles[3, , ]
+
+
+# Calculate width of credible intervals.
+adj_range <- adj_upper - adj_lower
+adj_range[is.nan(adj_range)] <- 0
+
+# Generate two igraph objects, one form the median and one from the standardised width.
+g_mid <- graph_from_adjacency_matrix(adj_mid, mode = "undirected", weighted=TRUE)
+g_range <- graph_from_adjacency_matrix(adj_range, mode = "undirected", weighted=TRUE)
+
+# Plot the median graph first and then the standardised width graph to show uncertainty over edges.
+coords <- igraph::layout_nicely(g_mid)
+
+plot(simplify(g_mid, remove.multiple = F), edge.width = 3 * E(g_mid)$weight, edge.color="black",  layout=coords, vertex.size = 5, label.cex = 5)
+
+plot(g_mid, edge.width=20 * E(g_range)$weight, edge.color=rgb(0, 0, 0, 0.25), 
+     vertex.label=c("Rey", "Leia", "Obi-Wan", "Luke", "C-3PO", "BB-8", "R2-D2", "D-O"), 
+     vertex.label.dist=4, vertex.label.color="black", layout=coords, add=TRUE)
 
 
 
 
 
-
-
-
-
-
+extract_metric(fit_inla, "node_eigen")
 
 
 

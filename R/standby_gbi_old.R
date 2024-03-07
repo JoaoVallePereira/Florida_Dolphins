@@ -30,18 +30,3 @@ dfDyads_full <- dfINFO_long %>%
   dplyr::distinct(node_1_id, node_2_id, .keep_all = TRUE) %>%
   dplyr::select(-IDs, -x) %>% 
   data.frame() 
-
-# Fit first model
-
-priors <- bisonR::get_default_priors("binary_conjugate")
-priors
-
-fit_edge <- bisonR::bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id), 
-  data= dfDyads_full, 
-  model_type = "binary",
-  priors = priors
-)
-
-summary(fit_edge)
-plot_network(fit_edge)
