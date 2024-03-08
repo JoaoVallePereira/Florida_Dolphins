@@ -59,10 +59,12 @@ plot(density(cv_samples))
 # Node eigenvector centrality
 cent_samples <- extract_metric(fit_edge, "node_eigen")
 cent_samples[1:6, 1:5]
+plot(density(cent_samples))
 
 # Node betweenness
 bet_samples <- extract_metric(fit_edge, "node_betweenness")
 bet_samples[1:6, 1:5]
+
 
 
 
