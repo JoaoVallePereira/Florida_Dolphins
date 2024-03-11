@@ -67,10 +67,7 @@ rawINFO <- dataForGBI %>%
 dfDyads_full2 <- df %>% 
   dplyr::left_join(rawINFO, by = "obs_id") %>% 
   dplyr::mutate(node_1 = as.factor(node_1),
-                node_2 = as.factor(node_2)) %>% 
-  dplyr::filter(social_event == 1 |
-                social_event == 2)
-
+                node_2 = as.factor(node_2))
 
 # 
 df4 <- dfDyads_full2 %>%

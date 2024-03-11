@@ -1,7 +1,18 @@
 #########
 
 df_dyads <- readRDS("./data/processed/DF_dyads.rds") %>% 
-  dplyr::mutate(duration = 1)
+  dplyr::mutate(node_1 = as.numeric(node_1),
+                node_2 = as.numeric(node_2)) %>% 
+  dplyr::filter(node_1 %in% c(1:50),
+                node_2 %in% c(1:50)) %>% 
+  dplyr::mutate(duration = 1) %>% 
+  dplyr::mutate(self = ifelse(node_1 == node_2, 1, 2)) %>% 
+  dplyr::filter(self == 2) %>% 
+  dplyr::mutate(node_1 = as.factor(node_1),
+                node_2 = as.factor(node_2)) %>% 
+  dplyr::select(-self)
+df_dyads$social_event <- sample(df_dyads$social_event)
+
 head(df_dyads)
 
 # Define priors
@@ -17,21 +28,19 @@ fit_edge <- bison_model(
   data = df_dyads, 
   model_type= "binary",
   priors=priors)
-# saveRDS(fit_edge, file = "./data/processed/fit_edge.rds")
-fit_edge <- readRDS("./data/processed/fit_edge.rds")
 
 # Check if MCMC algorithm has behaved correctly
 plot_trace(fit_edge, par_ids=2)
 
 # Check the predictions from the fitted model against the real data
 plot_predictions(fit_edge, num_draws=20, type="density")
-plot_predictions(fit_edge, type="point")
+plot_predictions(fit_edge, num_draws=20, type="point")
 
 #####
 summary(fit_edge)
 
 # Plot the network
-plot_network(fit_edge, lwd = 5)
+bisonR::plot_network(fit_edge, lwd = 3)
 
 
 # Bayesian version of the Bejder et al. 1998 test for non-random association
@@ -40,7 +49,6 @@ fit_null <- bison_model(
   data = df_dyads, 
   model_type = "binary",
   priors = priors)
-# saveRDS(fit_null, file = "./data/processed/fit_null.rds")
 
 model_comparison(list(non_random_model=fit_edge, random_model=fit_null))
 
@@ -64,35 +72,3 @@ plot(density(cent_samples))
 # Node betweenness
 bet_samples <- extract_metric(fit_edge, "node_betweenness")
 bet_samples[1:6, 1:5]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
