@@ -59,8 +59,6 @@ for (obs_id in 1:nrow(obs)) {
   }
 }
 head(df)
-# saveRDS(df, file = "./data/processed/DyadLong.rds")
-df <- readRDS(file = "./data/processed/DyadLong.rds")
 
 # Behavior, tactic and zone status ----
 rawINFO <- dataForGBI %>% 
