@@ -1,6 +1,9 @@
+# README #
 <img src="man/Figures/FloridaDolphinsLogo.png" align="right" width="200px"/>
 
-# README #
+ORIGINAL DATA FOLDER IS HIDDEN FOR THE MOMENT!!!!!!!!!!
+
+If you are reading this message that means that the available data to run the codes is a randomized subset of the original data, it has the same structure with fewer individuals and sampled nodes
 
 ## Author, maintainer and contact
 
@@ -17,10 +20,6 @@ This repository includes the R script to reproduce the analyses and the suppleme
 Resilience of dolphin foraging cultures facing climate and habitat changes
 
 Valle-Pereira, J.V.S [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](http://orcid.org/0000-0002-1880-9495); Cantor, M. [![](https://orcid.org/sites/default/files/images/orcid_16x16.png)](http://orcid.org/0000-0002-0019-5106), Torres, L. *In prep*.
-
-ORIGINAL DATA FOLDER IS HIDDEN FOR THE MOMENT!!!!!!!!!!
-
-## If you are reading this message that means that the available data to run the codes is a randomized subset of the original data, it has the same structure with fewer individuals and sampled nodes ##
 
 ## Contents
 
