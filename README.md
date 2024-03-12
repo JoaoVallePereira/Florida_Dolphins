@@ -1,5 +1,5 @@
 # README #
-<img src="man/Figures/FloridaDolphinsLogo.png" align="right" width="200px"/>
+<img src="man/Figures/FloridaDolphinsLogo.png" align="right" width="170px"/>
 
 ORIGINAL DATA FOLDER IS HIDDEN FOR THE MOMENT!!!!!!!!!!
 
