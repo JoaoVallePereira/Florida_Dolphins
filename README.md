@@ -62,6 +62,38 @@ Florida_Dolphins/
 ```
 **Note:** The workflow to run at the time of this message is:  `Setup.R` &rarr; `GetDyads.R` &rarr; `GetNetwork.R`. Remember that the `GetDyads.R` won't be working for now
 
+--------------------------------------
+
+**This is a snippet from https://github.com/JHart96/bisonR to install the bisonR package:**
+## Installation
+
+### Installing CmdStanR
+
+The bisonR package is written in R, but uses the Stan programming language to fit Bayesian models. Stan is a separate program, and interfaces with bisonR using an R package called cmdstanR. Stan and cmdstanR are installed in a different way to standard R packages, so require a specific series of installation steps. 
+
+On Windows, before proceeding you may need to install the version of Rtools appropriate for your version of R. Rtools can be found here: https://cran.r-project.org/bin/windows/Rtools/.
+
+The full instructions to install cmdstanR can be found at https://mc-stan.org/cmdstanr/. We've found that the following steps often work, but depending on your operating system and version of R, the process may be more involved.
+
+```r
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+library(cmdstanr)
+check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
+install_cmdstan() # On networked PCs, specify a local directory here with the argument dir=path_to_local_directory
+```
+
+### Installing bisonR
+
+bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `remotes` package installed. Then run the following command:
+
+```r
+remotes::install_github("JHart96/bisonR")
+```
+
+**Check out his repository for more information**
+
+**Also check out his *Getting Started* page here: https://jhart96.github.io/bisonR/articles/getting_started.html.**
+
 
 
 
