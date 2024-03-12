@@ -30,7 +30,7 @@ ORIGINAL DATA FOLDER IS HIDDEN FOR THE MOMENT!!!!!!!!!!
 
 ### 1.1. Data and script to reproduce the analysis
 
-- `setup.R`: This file contains the code to install and load the packages required to run the analyses in `GetNetwork.R`.
+- `Setup.R`: This file contains the code to install and load the packages required to run the analyses in `GetNetwork.R`.
 
 - `GetNetwork.R`: This file contains the code to run the analyses of the manuscript.
 
@@ -48,4 +48,28 @@ ORIGINAL DATA FOLDER IS HIDDEN FOR THE MOMENT!!!!!!!!!!
 | zone            | Character          | Zone where the individuals were seen |
 | dyad_id         | Integer            | Dyad identification                  |
 | duration        | Numeric            | Duration of the social event         |
+
+### 1.3. Instructions
+
+Scripts contain relative paths to source functions and load data. Open an R session and set the working directory to the root of the project for better compatibility with relative paths. The tree below show how files were organized in the project folder:
+
+```bash
+Florida_Dolphins/
+├── dataAW/                   # contains the data used in the manuscript
+├── R/                        # contains the code to setup run the analyses
+├── output/                   # stores tables and figures # NOTHING FOR NOW
+└── man/                      # contains figures and models to either implement on the analysis or in the GitHub layout
+```
+**Note:** The workflow to run at the time of this message is:  `Setup.R` &rarr; `GetDyads.R` &rarr; `GetNetwork.R`. Remember that the `GetDyads.R` won't be working for now
+
+
+
+
+
+
+
+
+
+
+
 
