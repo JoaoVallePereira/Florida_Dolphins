@@ -55,7 +55,7 @@ Scripts contain relative paths to source functions and load data. Open an R sess
 
 ```bash
 Florida_Dolphins/
-├── dataAW/                   # contains the data used in the manuscript
+├── dataAW/processedAW        # contains the data used in the manuscript
 ├── R/                        # contains the code to setup run the analyses
 ├── output/                   # stores tables and figures # NOTHING FOR NOW
 └── man/                      # contains figures and models to either implement on the analysis or in the GitHub layout
