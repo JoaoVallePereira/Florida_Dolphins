@@ -77,6 +77,14 @@ fit_dyadic <- bisonR::bison_brm(
   refresh = 0)
 summary(fit_dyadic)
 
+fit_dyads_tactic <- bisonR::bison_brm(
+  bison(edge_weight(node_1, node_2)) ~ tactic,
+  fit_edge,
+  df_dyads,
+  num_draws = 5, # Small sample size for demonstration purposes
+  refresh = 0)
+summary(fit_dyads_tactic)
+
 
 
 
