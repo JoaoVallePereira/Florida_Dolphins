@@ -1,7 +1,5 @@
 dfINFO <- data.raw %>% 
   dplyr::select(date, foraging, tactic, zone, IDs) 
-rownames(dfINFO) <- paste("G",1:nrow(rawGBI), sep = "")
-
 
 # Long data frame with groups column
 
@@ -16,6 +14,19 @@ group_size <- dfINFO_long %>%
 dfINFO_long <- dfINFO_long %>% 
   dplyr::left_join(group_size, by = "group") %>% 
   dplyr::rename(group_size = n)
+head(dfINFO_long)
+
+dfCount <- dfINFO_long %>% 
+  dplyr::group_by(IDs) %>% 
+  dplyr::count() %>% 
+  dplyr::filter(n > 1)
+dfIDs <- dfCount$IDs
+
+dfINFO_long_filter <- dfINFO_long %>% 
+  dplyr::filter(IDs %in% dfIDs) 
+
+
+
 
 
 #### Get dyads ####
@@ -30,3 +41,7 @@ dfDyads_full <- dfINFO_long %>%
   dplyr::distinct(node_1_id, node_2_id, .keep_all = TRUE) %>%
   dplyr::select(-IDs, -x) %>% 
   data.frame() 
+
+
+
+head(dfDyads_full)
