@@ -2,9 +2,9 @@
 
 # Load dyads data
 
-fit_edge <- readRDS("./data/processed/fit_edge.rds")
-fit_null <- readRDS("./data/processed/fit_null.rds")
-fit_brm <- readRDS("./data/processed/fit_brm.rds")
+# fit_edge <- readRDS("./data/processed/fit_edge.rds")
+# fit_null <- readRDS("./data/processed/fit_null.rds")
+# fit_brm <- readRDS("./data/processed/fit_brm.rds")
 
 df_dyads <- readRDS(file = "./data/processed/DF_dyads.rds") %>% 
   dplyr::mutate(duration = 1)

@@ -221,6 +221,29 @@ dfDyads_For <- df %>%
   dplyr::mutate(obs_id = as.integer(obs_id))
 saveRDS(dfDyads_For, file = "./data/processed/DF_dyadsFor.rds")
 
+## Convert to long format (dyad) TAKES SOME TIME (load rds in the sequence) !!!! ----
+df <- data.frame(node_1=numeric(), node_2=numeric(), social_event=numeric(), obs_id=numeric())
+obs <- obsMRF
+
+for (obs_id in 1:nrow(obs)) {
+  for (i in which(obs[obs_id, ] == 1)) {
+    for (j in 1:ncol(obs)) {
+      if (i != j) {
+        # Swap i and j if necessary to make sure node_1 < node_2, not essential but makes things a bit easier when assigning dyad IDs.
+        if (i < j) {
+          node_1 <- i
+          node_2 <- j
+        } else {
+          node_1 <- j
+          node_2 <- i
+        }
+        df[nrow(df) + 1, ] <- list(node_1 = node_1, node_2 = node_2, social_event=(obs[obs_id, i] == obs[obs_id, j]), obs_id = obs_id)
+      }
+    }
+  }
+}
+head(df)
+
 
 # Get dyads with observations information
 dfDyads_MRF <- df %>% 
