@@ -41,8 +41,29 @@ dfGroupSize <- dfINFO_long %>%
 
 dfINFO_long <- dfINFO_long %>% 
   dplyr::left_join(dfGroupSize, by = "group") 
-
 head(dfINFO_long)
+
+# Get Fp MRF
+
+df_FpMRF <- dfINFO_long %>% 
+  dplyr::filter(foraging == "Yes" |
+                  foraging == "Prob") %>%
+  dplyr::mutate(MRF = ifelse(tactic == "MRF", "MRF", "other")) %>% 
+  dplyr::group_by(IDs, MRF) %>% 
+  dplyr::count() %>% 
+  tidyr::spread(MRF, n) %>% 
+  dplyr::mutate(MRF = ifelse(is.na(MRF), 0, MRF),
+                other = ifelse(is.na(other), 0, other),
+                all = MRF + other) %>% 
+  dplyr::mutate(FpMRF = MRF/all)
+
+# Merge df info long + df FP MRF
+
+dfINFO_long <- dfINFO_long %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(IDs, FpMRF),
+                   by = "IDs") %>% 
+  dplyr::mutate(FpMRF = ifelse(is.na(FpMRF), 0, FpMRF))
 
 # Filter IDs > 1
 dfCount <- dfINFO_long %>% 
@@ -143,6 +164,20 @@ for (obs_id in 1:nrow(obs)) {
 }
 head(df)
 
+IDs_ALL_node1 <- data.frame(IDs = rownames(t(obsALL))) %>% 
+  dplyr::mutate(node_1 = as.factor(1:nrow(.))) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(FpMRF, IDs), by = "IDs") %>% 
+  dplyr::mutate(FpMRF_node1 = ifelse(is.na(FpMRF), 0, FpMRF)) %>% 
+  dplyr::select(-FpMRF)
+
+IDs_ALL_node2 <- data.frame(IDs = rownames(t(obsALL))) %>% 
+  dplyr::mutate(node_2 = as.factor(1:nrow(.))) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(FpMRF, IDs), by = "IDs") %>% 
+  dplyr::mutate(FpMRF_node2 = ifelse(is.na(FpMRF), 0, FpMRF)) %>% 
+  dplyr::select(-FpMRF)
+
 # Get dyads with observations information
 dfDyads_full <- df %>%  
   dplyr::left_join(dataForGBI, by = "obs_id") %>% 
@@ -150,8 +185,12 @@ dfDyads_full <- df %>%
                 node_2 = as.factor(node_2)) %>%
   dplyr::group_by(node_1, node_2) %>%
   dplyr::mutate(dyad_id = dplyr::cur_group_id()) %>%
-  dplyr::mutate(obs_id = as.integer(obs_id))
-saveRDS(df4, file = "./data/processed/DF_dyads.rds")
+  dplyr::mutate(obs_id = as.integer(obs_id)) %>% 
+  dplyr::left_join(IDs_ALL_node1, by = "node_1") %>% 
+  dplyr::left_join(IDs_ALL_node2, by = "node_2") %>% 
+  dplyr::rename(node_1ID = IDs.x, node_2ID = IDs.y) %>% 
+  dplyr::mutate(Fpdiff = FpMRF_node1 - FpMRF_node2)
+saveRDS(dfDyads_full, file = "./data/processed/DF_dyads.rds")
 
 ## Convert to long format (dyad) TAKES SOME TIME (load rds in the sequence) !!!! ----
 df <- data.frame(node_1=numeric(), node_2=numeric(), social_event=numeric(), obs_id=numeric())
@@ -175,7 +214,21 @@ for (obs_id in 1:nrow(obs)) {
     }
   }
 }
+head(df)
 
+IDs_NoFor_node1 <- data.frame(IDs = rownames(t(obsNoFor))) %>% 
+  dplyr::mutate(node_1 = as.factor(1:nrow(.))) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(FpMRF, IDs), by = "IDs") %>% 
+  dplyr::mutate(FpMRF_node1 = ifelse(is.na(FpMRF), 0, FpMRF)) %>% 
+  dplyr::select(-FpMRF)
+
+IDs_NoFor_node2 <- data.frame(IDs = rownames(t(obsNoFor))) %>% 
+  dplyr::mutate(node_2 = as.factor(1:nrow(.))) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(FpMRF, IDs), by = "IDs") %>% 
+  dplyr::mutate(FpMRF_node2 = ifelse(is.na(FpMRF), 0, FpMRF)) %>% 
+  dplyr::select(-FpMRF)
 
 # Get dyads with observations information
 dfDyads_Nofor <- df %>% 
@@ -184,7 +237,11 @@ dfDyads_Nofor <- df %>%
                 node_2 = as.factor(node_2)) %>%
   dplyr::group_by(node_1, node_2) %>%
   dplyr::mutate(dyad_id = dplyr::cur_group_id()) %>%
-  dplyr::mutate(obs_id = as.integer(obs_id))
+  dplyr::mutate(obs_id = as.integer(obs_id)) %>% 
+  dplyr::left_join(IDs_NoFor_node1, by = "node_1") %>% 
+  dplyr::left_join(IDs_NoFor_node2, by = "node_2") %>% 
+  dplyr::rename(node_1ID = IDs.x, node_2ID = IDs.y) %>% 
+  dplyr::mutate(Fpdiff = FpMRF_node1 - FpMRF_node2)
 saveRDS(dfDyads_Nofor, file = "./data/processed/DF_dyadsNofor.rds")
 
 ## Convert to long format (dyad) TAKES SOME TIME (load rds in the sequence) !!!! ----
@@ -210,6 +267,19 @@ for (obs_id in 1:nrow(obs)) {
 }
 head(df)
 
+IDs_For_node1 <- data.frame(IDs = rownames(t(obsFor))) %>% 
+  dplyr::mutate(node_1 = as.factor(1:nrow(.))) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(FpMRF, IDs), by = "IDs") %>% 
+  dplyr::mutate(FpMRF_node1 = ifelse(is.na(FpMRF), 0, FpMRF)) %>% 
+  dplyr::select(-FpMRF)
+
+IDs_For_node2 <- data.frame(IDs = rownames(t(obsFor))) %>% 
+  dplyr::mutate(node_2 = as.factor(1:nrow(.))) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(FpMRF, IDs), by = "IDs") %>% 
+  dplyr::mutate(FpMRF_node2 = ifelse(is.na(FpMRF), 0, FpMRF)) %>% 
+  dplyr::select(-FpMRF)
 
 # Get dyads with observations information
 dfDyads_For <- df %>% 
@@ -218,7 +288,11 @@ dfDyads_For <- df %>%
                 node_2 = as.factor(node_2)) %>%
   dplyr::group_by(node_1, node_2) %>%
   dplyr::mutate(dyad_id = dplyr::cur_group_id()) %>%
-  dplyr::mutate(obs_id = as.integer(obs_id))
+  dplyr::mutate(obs_id = as.integer(obs_id)) %>% 
+  dplyr::left_join(IDs_For_node1, by = "node_1") %>% 
+  dplyr::left_join(IDs_For_node2, by = "node_2") %>% 
+  dplyr::rename(node_1ID = IDs.x, node_2ID = IDs.y) %>% 
+  dplyr::mutate(Fpdiff = FpMRF_node1 - FpMRF_node2)
 saveRDS(dfDyads_For, file = "./data/processed/DF_dyadsFor.rds")
 
 ## Convert to long format (dyad) TAKES SOME TIME (load rds in the sequence) !!!! ----
@@ -244,6 +318,19 @@ for (obs_id in 1:nrow(obs)) {
 }
 head(df)
 
+IDs_MRF_node1 <- data.frame(IDs = rownames(t(obsMRF))) %>% 
+  dplyr::mutate(node_1 = as.factor(1:nrow(.))) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(FpMRF, IDs), by = "IDs") %>% 
+  dplyr::mutate(FpMRF_node1 = ifelse(is.na(FpMRF), 0, FpMRF)) %>% 
+  dplyr::select(-FpMRF)
+
+IDs_MRF_node2 <- data.frame(IDs = rownames(t(obsMRF))) %>% 
+  dplyr::mutate(node_2 = as.factor(1:nrow(.))) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(FpMRF, IDs), by = "IDs") %>% 
+  dplyr::mutate(FpMRF_node2 = ifelse(is.na(FpMRF), 0, FpMRF)) %>% 
+  dplyr::select(-FpMRF)
 
 # Get dyads with observations information
 dfDyads_MRF <- df %>% 
@@ -252,6 +339,23 @@ dfDyads_MRF <- df %>%
                 node_2 = as.factor(node_2)) %>%
   dplyr::group_by(node_1, node_2) %>%
   dplyr::mutate(dyad_id = dplyr::cur_group_id()) %>%
-  dplyr::mutate(obs_id = as.integer(obs_id))
+  dplyr::mutate(obs_id = as.integer(obs_id)) %>% 
+  dplyr::left_join(IDs_MRF_node1, by = "node_1") %>% 
+  dplyr::left_join(IDs_MRF_node2, by = "node_2") %>% 
+  dplyr::rename(node_1ID = IDs.x, node_2ID = IDs.y) %>% 
+  dplyr::mutate(Fpdiff = FpMRF_node1 - FpMRF_node2)
 saveRDS(dfDyads_MRF, file = "./data/processed/DF_dyadsMRF.rds")
+
+
+
+
+
+
+
+
+
+
+
+
+
 

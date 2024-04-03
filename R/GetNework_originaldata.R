@@ -2,10 +2,6 @@
 
 # Load dyads data
 
-# fit_edge <- readRDS("./data/processed/fit_edge.rds")
-# fit_null <- readRDS("./data/processed/fit_null.rds")
-# fit_brm <- readRDS("./data/processed/fit_brm.rds")
-
 df_dyads <- readRDS(file = "./data/processed/DF_dyads.rds") %>% 
   dplyr::mutate(duration = 1)
 head(df_dyads)
@@ -18,11 +14,117 @@ priors
 bisonR::prior_check(priors, "binary")
 
 # Fit bison model
-fit_edge <- bisonR::bison_model(
+fit_edgeALL <- bisonR::bison_model(
   (social_event | duration) ~ dyad(node_1, node_2), 
   data = df_dyads, 
   model_type = "binary",
   priors = priors)
+saveRDS(fit_edgeALL, file = "./data/processed/fit_edgeALL.rds")
+
+################################
+dfDyads_Nofor <- readRDS(file = "./data/processed/DF_dyadsNofor.rds") %>% 
+  dplyr::mutate(duration = 1)
+head(dfDyads_Nofor)
+
+# Define priors
+
+priors <- bisonR::get_default_priors("binary")
+priors
+
+bisonR::prior_check(priors, "binary")
+
+# Fit bison model
+fit_edgeNoFor <- bisonR::bison_model(
+  (social_event | duration) ~ dyad(node_1, node_2), 
+  data = dfDyads_Nofor, 
+  model_type = "binary",
+  priors = priors)
+saveRDS(fit_edgeNoFor, file = "./data/processed/fit_edgeNoFor.rds")
+
+################################
+dfDyads_For <- readRDS(file = "./data/processed/DF_dyadsFor.rds") %>% 
+  dplyr::mutate(duration = 1)
+head(dfDyads_For)
+
+# Define priors
+
+priors <- bisonR::get_default_priors("binary")
+priors
+
+bisonR::prior_check(priors, "binary")
+
+# Fit bison model
+fit_edgeFor <- bisonR::bison_model(
+  (social_event | duration) ~ dyad(node_1, node_2), 
+  data = dfDyads_For, 
+  model_type = "binary",
+  priors = priors)
+saveRDS(fit_edgeFor, file = "./data/processed/fit_edgeFor.rds")
+
+################################
+dfDyads_MRF <- readRDS(file = "./data/processed/DF_dyadsMRF.rds") %>% 
+  dplyr::mutate(duration = 1)
+head(dfDyads_MRF)
+
+# Define priors
+
+priors <- bisonR::get_default_priors("binary")
+priors
+
+bisonR::prior_check(priors, "binary")
+
+# Fit bison model
+fit_edgeMRF <- bisonR::bison_model(
+  (social_event | duration) ~ dyad(node_1, node_2), 
+  data = dfDyads_MRF, 
+  model_type = "binary",
+  priors = priors)
+saveRDS(fit_edgeMRF, file = "./data/processed/fit_edgeMRF.rds")
+
+####
+
+summary.fit_edgeALL <- summary(fit_edgeALL)
+edgelist.fit_edgeALL <- summary.fit_edgeALL$edgelist %>% 
+  dplyr::left_join(dfDyads_ALL, by = c("node_1", "node_2")) %>% 
+  dplyr::distinct(node_1, node_2, .keep_all = TRUE)
+
+summary.fit_edgeNoFor <- summary(fit_edgeNoFor)
+edgelist.fit_edgeNoFor <- summary.fit_edgeNoFor$edgelist %>% 
+  dplyr::left_join(dfDyads_NoFor, by = c("node_1", "node_2")) %>% 
+  dplyr::distinct(node_1, node_2, .keep_all = TRUE)
+
+summary.fit_edgeFor <- summary(fit_edgeFor)
+edgelist.fit_edgeFor <- summary.fit_edgeFor$edgelist  %>% 
+  dplyr::left_join(dfDyads_For, by = c("node_1", "node_2")) %>% 
+  dplyr::distinct(node_1, node_2, .keep_all = TRUE)
+
+summary.fit_edgeMRF <- summary(fit_edgeMRF)
+edgelist.fit_edgeMRF <- summary.fit_edgeMRF$edgelist %>% 
+  dplyr::left_join(dfDyads_MRF, by = c("node_1", "node_2")) %>% 
+  dplyr::distinct(node_1, node_2, .keep_all = TRUE)
+
+edgelist.fit_edgeALL
+edgelist.fit_edgeNoFor
+edgelist.fit_edgeFor
+edgelist.fit_edgeMRF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Check if MCMC algorithm has behaved correctly
 bisonR::plot_trace(fit_edge, par_ids=2)
