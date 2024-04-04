@@ -85,12 +85,12 @@ saveRDS(fit_edgeMRF, file = "./data/processed/fit_edgeMRF.rds")
 
 summary.fit_edgeALL <- summary(fit_edgeALL)
 edgelist.fit_edgeALL <- summary.fit_edgeALL$edgelist %>% 
-  dplyr::left_join(dfDyads_ALL, by = c("node_1", "node_2")) %>% 
+  dplyr::left_join(df_dyads, by = c("node_1", "node_2")) %>% 
   dplyr::distinct(node_1, node_2, .keep_all = TRUE)
 
 summary.fit_edgeNoFor <- summary(fit_edgeNoFor)
 edgelist.fit_edgeNoFor <- summary.fit_edgeNoFor$edgelist %>% 
-  dplyr::left_join(dfDyads_NoFor, by = c("node_1", "node_2")) %>% 
+  dplyr::left_join(dfDyads_Nofor, by = c("node_1", "node_2")) %>% 
   dplyr::distinct(node_1, node_2, .keep_all = TRUE)
 
 summary.fit_edgeFor <- summary(fit_edgeFor)
@@ -108,8 +108,101 @@ edgelist.fit_edgeNoFor
 edgelist.fit_edgeFor
 edgelist.fit_edgeMRF
 
+edgesALL <- edgelist.fit_edgeALL %>% 
+  dplyr::select(node_1, node_2, weight = median, )
+nodesALL <- c("1", unique(edgelist.fit_edgeALL$node_2))
+
+graphALL <- igraph::graph_from_data_frame(d = edgesALL, vertices = nodesALL, directed = FALSE)
+graphALL
+plot(graphALL)
+
+##################
+
+edgesNoFor <- edgelist.fit_edgeNoFor %>% 
+  dplyr::select(node_1ID, node_2ID, weight = median)
+
+nodesNoFor <- data.frame(c(edgelist.fit_edgeNoFor$node_1ID[1], unique(edgelist.fit_edgeNoFor$node_2ID))) %>% 
+  dplyr::rename(IDs = 1) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(IDs, FpMRF), by = "IDs") %>% 
+  dplyr::mutate(FpMRF = ifelse(is.na(FpMRF), 0, FpMRF))
+
+graphNoFor <- igraph::graph_from_data_frame(d = edgesNoFor, vertices = nodesNoFor, directed = FALSE)
+V(graphNoFor)$size <- nodesNoFor$FpMRF * 20 + 7
+plot(graphNoFor)
 
 
+
+
+
+
+
+
+
+edgesMRF <- edgelist.fit_edgeMRF %>% 
+  dplyr::select(node_1ID, node_2ID, weight = median)
+
+nodesMRF <- data.frame(c(edgelist.fit_edgeMRF$node_1ID[1], unique(edgelist.fit_edgeMRF$node_2ID))) %>% 
+  dplyr::rename(IDs = 1) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(IDs, FpMRF), by = "IDs")  
+
+graphMRF <- igraph::graph_from_data_frame(d = edgesMRF, vertices = nodesMRF, directed = FALSE)
+V(graphMRF)$size <- nodesMRF$FpMRF * 20
+plot(graphMRF)
+
+
+###
+dyadicALL <- df_dyads %>% 
+  dplyr::select(node_1, node_2, Fpdiff) %>% 
+  dplyr::distinct()
+
+fit_dyadicALL <- bison_brm(
+  bison(edge_weight(node_1, node_2)) ~ Fpdiff,
+  fit_edgeALL,
+  dyadicALL,
+  num_draws = 10, # Small sample size for demonstration purposes
+  refresh = 0)
+saveRDS(fit_dyadicALL, file = "./data/processed/fit_dyadicALL.rds")
+
+###
+dyadicNoFor <- dfDyads_Nofor %>% 
+  dplyr::select(node_1, node_2, Fpdiff) %>% 
+  dplyr::distinct()
+
+fit_dyadicNoFor <- bison_brm(
+  bison(edge_weight(node_1, node_2)) ~ Fpdiff,
+  fit_edgeNoFor,
+  dyadicNoFor,
+  num_draws = 10, # Small sample size for demonstration purposes
+  refresh = 0)
+saveRDS(dyadicNoFor, file = "./data/processed/dyadicNoFor.rds")
+
+###
+dyadicFor <- dfDyads_For %>% 
+  dplyr::select(node_1, node_2, Fpdiff) %>% 
+  dplyr::distinct()
+
+fit_dyadicFor <- bison_brm(
+  bison(edge_weight(node_1, node_2)) ~ Fpdiff,
+  fit_edgeFor,
+  dyadicFor,
+  num_draws = 10, # Small sample size for demonstration purposes
+  refresh = 0)
+saveRDS(fit_dyadicFor, file = "./data/processed/fit_dyadicFor.rds")
+
+###
+dyadicMRF <- dfDyads_MRF %>% 
+  dplyr::select(node_1, node_2, Fpdiff) %>% 
+  dplyr::distinct()
+
+fit_dyadicMRF <- bison_brm(
+  bison(edge_weight(node_1, node_2)) ~ Fpdiff,
+  fit_edgeMRF,
+  dyadicMRF,
+  num_draws = 10, # Small sample size for demonstration purposes
+  refresh = 0)
+saveRDS(fit_dyadicMRF, file = "./data/processed/fit_dyadicMRF.rds")
 
 
 
