@@ -108,16 +108,26 @@ edgelist.fit_edgeNoFor
 edgelist.fit_edgeFor
 edgelist.fit_edgeMRF
 
-edgesALL <- edgelist.fit_edgeALL %>% 
-  dplyr::select(node_1, node_2, weight = median, )
-nodesALL <- c("1", unique(edgelist.fit_edgeALL$node_2))
-
-graphALL <- igraph::graph_from_data_frame(d = edgesALL, vertices = nodesALL, directed = FALSE)
-graphALL
-plot(graphALL)
 
 ##################
+edgesALL <- edgelist.fit_edgeALL %>% 
+  dplyr::select(node_1ID, node_2ID, weight = median)
 
+nodesALL <- data.frame(c(edgelist.fit_edgeALL$node_1ID[1], unique(edgelist.fit_edgeALL$node_2ID))) %>% 
+  dplyr::rename(IDs = 1) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(IDs, FpMRF), by = "IDs") %>% 
+  dplyr::mutate(FpMRF = ifelse(is.na(FpMRF), 0, FpMRF))
+
+graphALL <- igraph::graph_from_data_frame(d = edgesALL, vertices = nodesALL, directed = FALSE)
+V(graphALL)$size <- nodesALL$FpMRF * 5 + 5
+V(graphALL)$label <- round(nodesALL$FpMRF, digits = 2)
+plot(graphALL)
+title("ALL", line = -0.9)
+
+
+
+#################
 edgesNoFor <- edgelist.fit_edgeNoFor %>% 
   dplyr::select(node_1ID, node_2ID, weight = median)
 
@@ -128,28 +138,44 @@ nodesNoFor <- data.frame(c(edgelist.fit_edgeNoFor$node_1ID[1], unique(edgelist.f
   dplyr::mutate(FpMRF = ifelse(is.na(FpMRF), 0, FpMRF))
 
 graphNoFor <- igraph::graph_from_data_frame(d = edgesNoFor, vertices = nodesNoFor, directed = FALSE)
-V(graphNoFor)$size <- nodesNoFor$FpMRF * 20 + 7
+V(graphNoFor)$size <- nodesNoFor$FpMRF * 5 + 5
+V(graphNoFor)$label <- round(nodesNoFor$FpMRF, digits = 2)
 plot(graphNoFor)
+title("No Foraging", line = -0.9)
 
 
+#############
+edgesFor <- edgelist.fit_edgeFor %>% 
+  dplyr::select(node_1ID, node_2ID, weight = median)
+
+nodesFor <- data.frame(c(edgelist.fit_edgeFor$node_1ID[1], unique(edgelist.fit_edgeFor$node_2ID))) %>% 
+  dplyr::rename(IDs = 1) %>% 
+  dplyr::left_join(df_FpMRF %>% 
+                     dplyr::select(IDs, FpMRF), by = "IDs") %>% 
+  dplyr::mutate(FpMRF = ifelse(is.na(FpMRF), 0, FpMRF))
+
+graphFor <- igraph::graph_from_data_frame(d = edgesFor, vertices = nodesFor, directed = FALSE)
+V(graphFor)$size <- nodesFor$FpMRF * 5 + 5
+V(graphFor)$label <- round(nodesFor$FpMRF, digits = 2)
+plot(graphFor)
+title("Foraging", line = -0.5)
 
 
-
-
-
-
-
+####################
 edgesMRF <- edgelist.fit_edgeMRF %>% 
   dplyr::select(node_1ID, node_2ID, weight = median)
 
 nodesMRF <- data.frame(c(edgelist.fit_edgeMRF$node_1ID[1], unique(edgelist.fit_edgeMRF$node_2ID))) %>% 
   dplyr::rename(IDs = 1) %>% 
   dplyr::left_join(df_FpMRF %>% 
-                     dplyr::select(IDs, FpMRF), by = "IDs")  
+                     dplyr::select(IDs, FpMRF), by = "IDs") %>% 
+  dplyr::mutate(FpMRF = ifelse(is.na(FpMRF), 0, FpMRF))
 
 graphMRF <- igraph::graph_from_data_frame(d = edgesMRF, vertices = nodesMRF, directed = FALSE)
-V(graphMRF)$size <- nodesMRF$FpMRF * 20
+V(graphMRF)$size <- nodesMRF$FpMRF * 5 + 5
+V(graphMRF)$label <- round(nodesMRF$FpMRF, digits = 2)
 plot(graphMRF)
+title("MRF", line = -0.5)
 
 
 ###
@@ -176,7 +202,7 @@ fit_dyadicNoFor <- bison_brm(
   dyadicNoFor,
   num_draws = 10, # Small sample size for demonstration purposes
   refresh = 0)
-saveRDS(dyadicNoFor, file = "./data/processed/dyadicNoFor.rds")
+saveRDS(fit_dyadicNoFor, file = "./data/processed/dyadicNoFor.rds")
 
 ###
 dyadicFor <- dfDyads_For %>% 
@@ -209,9 +235,29 @@ saveRDS(fit_dyadicMRF, file = "./data/processed/fit_dyadicMRF.rds")
 
 
 
+###### NETWORK METRICS
 
+par(mfrow=c(2,2))
+# Node eigenvector centrality
+NodeEigen_ALL <- bisonR::extract_metric(fit_edgeALL, "node_eigen")
+NodeEigen_ALL
+plot(density(NodeEigen_ALL))
+title("ALL", line = 0.5)
 
+NodeEigen_NoFor <- bisonR::extract_metric(fit_edgeNoFor, "node_eigen")
+NodeEigen_NoFor
+plot(density(NodeEigen_NoFor))
+title("No Foraging", line = 0.5)
 
+NodeEigen_For <- bisonR::extract_metric(fit_edgeFor, "node_eigen")
+NodeEigen_For
+plot(density(NodeEigen_For))
+title("Foraging", line = 0.5)
+
+NodeEigen_MRF <- bisonR::extract_metric(fit_edgeMRF, "node_eigen")
+NodeEigen_MRF
+plot(density(NodeEigen_MRF))
+title("MRF", line = 0.5)
 
 
 
