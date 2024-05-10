@@ -21,6 +21,7 @@ fit_edgeALL <- bisonR::bison_model(
   priors = priors)
 saveRDS(fit_edgeALL, file = "./data/processed/fit_edgeALL.rds")
 
+
 ################################
 dfDyads_Nofor <- readRDS(file = "./data/processed/DF_dyadsNofor.rds") %>% 
   dplyr::mutate(duration = 1)
@@ -229,10 +230,6 @@ fit_dyadicMRF <- bison_brm(
   num_draws = 10, # Small sample size for demonstration purposes
   refresh = 0)
 saveRDS(fit_dyadicMRF, file = "./data/processed/fit_dyadicMRF.rds")
-
-
-
-
 
 
 ###### NETWORK METRICS
