@@ -26,3 +26,22 @@ saveRDS(fit_mixtureNoFor, file = "./data/processed/fit_mixtureNoFor.rds")
 saveRDS(fit_mixtureFor, file = "./data/processed/fit_mixtureFor.rds")
 saveRDS(fit_mixtureMRF, file = "./data/processed/fit_mixtureMRF.rds")
 
+
+
+
+##
+fit_mixtureALL_c <- bisonR::bison_mixture(fit_edgeall_c, num_components=5, verbose=FALSE)
+summary(fit_mixtureALL_c)
+
+##
+fit_mixtureNoFor_c <- bisonR::bison_mixture(fit_edgeNoFor_c, num_components=5, verbose=FALSE)
+summary(fit_mixtureNoFor_c)
+
+##
+fit_mixtureFor_c <- bisonR::bison_mixture(fit_edgeFor_c, num_components=5, verbose=FALSE)
+summary(fit_mixtureFor_c)
+
+##
+fit_mixtureMRF_c <- bisonR::bison_mixture(fit_edgeMRF_c, num_components=5, verbose=FALSE)
+summary(fit_mixtureMRF_c)
+

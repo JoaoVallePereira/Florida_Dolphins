@@ -27,6 +27,25 @@ dfDyads_Nofor <- readRDS(file = "./data/processed/DF_dyadsNofor.rds") %>%
   dplyr::mutate(duration = 1)
 head(dfDyads_Nofor)
 
+dfDyads_Nofor_join <- dfDyads_Nofor %>% 
+  dplyr::filter(social_event != 0) %>% 
+  dplyr::mutate(dyad_id = paste(node_1, node_2, sep = "")) 
+
+dfDyads_Nofor_joined <- dfDyads_Nofor %>% 
+  dplyr::filter(social_event != 0) %>% 
+  dplyr::mutate(dyad_id = paste(node_1, node_2, sep = "")) %>% 
+  dplyr::group_by(dyad_id) %>% 
+  dplyr::summarise(event_sum = sum(social_event),
+                   duration_sum = sum(duration))
+head(dfDyads_Nofor_joined)
+
+dfDyads_Nofor_count <- dfDyads_Nofor_joined %>% 
+  dplyr::left_join(dfDyads_Nofor_join, by = "dyad_id") %>% 
+  dplyr::distinct(node_1, node_2, .keep_all = TRUE) %>% 
+  dplyr::select(node_1, node_2, social_event = event_sum, duration = duration_sum)
+head(dfDyads_Nofor_count)
+
+
 # Define priors
 
 priors <- bisonR::get_default_priors("binary")
@@ -34,13 +53,32 @@ priors
 
 bisonR::prior_check(priors, "binary")
 
-# Fit bison model
-fit_edgeNoFor <- bisonR::bison_model(
+# Fit bison model binary
+fit_edgeNoFor_bi <- bisonR::bison_model(
   (social_event | duration) ~ dyad(node_1, node_2), 
   data = dfDyads_Nofor, 
   model_type = "binary",
   priors = priors)
-saveRDS(fit_edgeNoFor, file = "./data/processed/fit_edgeNoFor.rds")
+# saveRDS(fit_edgeNoFor, file = "./data/processed/fit_edgeNoFor.rds")
+
+
+# Fit bison model count
+# Define priors
+
+priors <- bisonR::get_default_priors("count")
+priors
+
+bisonR::prior_check(priors, "count")
+
+fit_edgeNoFor_c <- bisonR::bison_model(
+  (social_event | duration) ~ dyad(node_1, node_2), 
+  data = dfDyads_Nofor_count, 
+  model_type = "count",
+  priors = priors)
+
+# Plot the network
+bisonR::plot_network(fit_edgeNoFor_c, lwd = 5)
+
 
 ################################
 dfDyads_For <- readRDS(file = "./data/processed/DF_dyadsFor.rds") %>% 

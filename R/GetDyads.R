@@ -145,25 +145,10 @@ obsMRF <- MRF_GBI
 df <- data.frame(node_1=numeric(), node_2=numeric(), social_event=numeric(), obs_id=numeric())
 obs <- obsALL
 
-for (obs_id in 1:nrow(obs)) {
-  for (i in which(obs[obs_id, ] == 1)) {
-    for (j in 1:ncol(obs)) {
-      if (i != j) {
-        # Swap i and j if necessary to make sure node_1 < node_2, not essential but makes things a bit easier when assigning dyad IDs.
-        if (i < j) {
-          node_1 <- i
-          node_2 <- j
-        } else {
-          node_1 <- j
-          node_2 <- i
-        }
-        df[nrow(df) + 1, ] <- list(node_1 = node_1, node_2 = node_2, social_event=(obs[obs_id, i] == obs[obs_id, j]), obs_id = obs_id)
-      }
-    }
-  }
-}
-head(df)
+df <- convert_gbi_to_bison(obs)
 
+
+##
 IDs_ALL_node1 <- data.frame(IDs = rownames(t(obsALL))) %>% 
   dplyr::mutate(node_1 = as.factor(1:nrow(.))) %>% 
   dplyr::left_join(df_FpMRF %>% 
