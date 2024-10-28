@@ -70,3 +70,4 @@ convert_gbi_to_bison <- function(gbi, group_properties=NULL, individual_properti
   }
   df
 }
+

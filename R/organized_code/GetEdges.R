@@ -1,6 +1,7 @@
 ################################
 dfDyads_all <- readRDS(file = "./data/processed/DF_dyads.rds") %>% 
-  dplyr::mutate(duration = 1)
+  dplyr::mutate(duration = 1) %>% 
+  dplyr::filter(zone != "Atlantic")
 head(dfDyads_all)
 
 dfDyads_all_join <- dfDyads_all %>% 
@@ -37,13 +38,15 @@ fit_edgeall_c <- bisonR::bison_model(
   model_type = "count",
   priors = priors)
 
+saveRDS(fit_edgeall_c, file = "./data/processed/processed_count/fit_edgeall_c.rds")
 # Plot the network
-bisonR::plot_network(fit_edgeall_c, lwd = 5)
+# bisonR::plot_network(fit_edgeall_c, lwd = 5)
 
 
 ################################
 dfDyads_Nofor <- readRDS(file = "./data/processed/DF_dyadsNofor.rds") %>% 
-  dplyr::mutate(duration = 1)
+  dplyr::mutate(duration = 1)%>% 
+  dplyr::filter(zone != "Atlantic")
 head(dfDyads_Nofor)
 
 dfDyads_Nofor_join <- dfDyads_Nofor %>% 
@@ -80,12 +83,14 @@ fit_edgeNoFor_c <- bisonR::bison_model(
   model_type = "count",
   priors = priors)
 
+saveRDS(fit_edgeNoFor_c, file = "./data/processed/processed_count/fit_edgeNoFor_c.rds")
 # Plot the network
-bisonR::plot_network(fit_edgeNoFor_c, lwd = 5)
+# bisonR::plot_network(fit_edgeNoFor_c, lwd = 5)
 
 ################################
 dfDyads_for <- readRDS(file = "./data/processed/DF_dyadsFor.rds") %>% 
-  dplyr::mutate(duration = 1)
+  dplyr::mutate(duration = 1)%>% 
+  dplyr::filter(zone != "Atlantic")
 head(dfDyads_for)
 
 dfDyads_for_join <- dfDyads_for %>% 
@@ -122,13 +127,15 @@ fit_edgeFor_c <- bisonR::bison_model(
   model_type = "count",
   priors = priors)
 
+saveRDS(fit_edgeFor_c, file = "./data/processed/processed_count/fit_edgeFor_c.rds")
 # Plot the network
-bisonR::plot_network(fit_edgeFor_c, lwd = 5)
+# bisonR::plot_network(fit_edgeFor_c, lwd = 5)
 
 
 ################################
 dfDyads_MRF <- readRDS(file = "./data/processed/DF_dyadsMRF.rds") %>% 
-  dplyr::mutate(duration = 1)
+  dplyr::mutate(duration = 1)%>% 
+  dplyr::filter(zone != "Atlantic")
 head(dfDyads_MRF)
 
 dfDyads_MRF_join <- dfDyads_MRF %>% 
@@ -165,9 +172,10 @@ fit_edgeMRF_c <- bisonR::bison_model(
   model_type = "count",
   priors = priors)
 
+saveRDS(fit_edgeMRF_c, file = "./data/processed/processed_count/fit_edgeMRF_c.rds")
+
 # Plot the network
 bisonR::plot_network(fit_edgeMRF_c, lwd = 5)
-
 
 
 # Plot networks togheter
@@ -181,3 +189,4 @@ bisonR::plot_network(fit_edgeFor_c, lwd = 5)
 title("For", line = -0.9)
 bisonR::plot_network(fit_edgeMRF_c, lwd = 5)
 title("MRF", line = -0.9)
+
